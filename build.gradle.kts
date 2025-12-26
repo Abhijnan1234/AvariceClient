@@ -7,7 +7,7 @@ plugins {
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 //    id("io.freefair.lombok") version "8.6"
-    id("net.kyori.blossom") version "1.3.2"
+    id("net.kyori.blossom") version "2.2.0"
 }
 
 //Constants:
