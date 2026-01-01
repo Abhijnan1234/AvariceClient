@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -11,12 +11,13 @@ base {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
+	mavenCentral()
+	maven { url = "https://maven.fabricmc.net/" }
+	maven { url = "https://maven.terraformersmc.com/releases/" }
+	// REQUIRED for Cloth Config
+	maven { url = "https://maven.shedaniel.me/" }
 }
+
 
 loom {
 	splitEnvironmentSourceSets()
@@ -31,15 +32,14 @@ loom {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+	minecraft "com.mojang:minecraft:1.21.1"
+	mappings "net.fabricmc:yarn:1.21.1+build.3:v2"
+	modImplementation "net.fabricmc:fabric-loader:0.16.0"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:0.102.0+1.21.1"
+	modImplementation "me.shedaniel.cloth:cloth-config-fabric:15.0.140"
+	modImplementation "com.terraformersmc:modmenu:11.0.2"
 }
+
 
 processResources {
 	inputs.property "version", project.version
