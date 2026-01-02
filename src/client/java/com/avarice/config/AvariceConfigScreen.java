@@ -9,73 +9,139 @@ import net.minecraft.text.Text;
 
 public class AvariceConfigScreen {
 
+    enum CropType {
+        STYPE(0, "Wheat/Carrots/Potato/Nether Wart"),
+        MELONKINGDE(1, "Pumpkin/ Melon(MELONKINGDE)"),
+        POTATO(2, "Potato"),
+        NETHER_WART(3, "Nether Wart"),
+        SUGAR_CANE(4, "Sugar Cane"),
+        COCOA(5, "Cocoa"),
+        MELON(6, "Melon"),
+        PUMPKIN(7, "Pumpkin");
+
+        public final int value;
+        public final String name;
+
+        CropType(int value, String name) {
+            this.value = value;
+            this.name = name;
+        }
+
+        public static CropType fromInt(int val) {
+            for (CropType c : values()) {
+                if (c.value == val) return c;
+            }
+            return STYPE; // default
+        }
+    }
+
     public static Screen create(Screen parent) {
 
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Text.literal("Avarice Client"));
 
-        builder.setSavingRunnable(() -> {
-            // later: save to file
-        });
-
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
 
-        /* GENERAL TAB */
-        ConfigCategory general = builder.getOrCreateCategory(Text.literal("General"));
-        general.addEntry(entryBuilder
-                .startBooleanToggle(
-                        Text.literal("Enable Mod"),
-                        AvariceConfig.INSTANCE.enableMod
-                )
-                .setSaveConsumer(val -> AvariceConfig.INSTANCE.enableMod = val)
-                .build());
+        /* ================= FARMING ================= */
 
-        /* FARMING TAB */
-        ConfigCategory farming = builder.getOrCreateCategory(Text.literal("Farming"));
+        ConfigCategory farming = builder.getOrCreateCategory(
+                Text.literal("Farming")
+        );
+
         farming.addEntry(entryBuilder
                 .startBooleanToggle(
-                        Text.literal("Enable Farming"),
+                        Text.literal("Enable Farming Macro"),
                         AvariceConfig.INSTANCE.farmingEnabled
                 )
+                .setTooltip(Text.literal("Master switch for farming macro"))
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.farmingEnabled = val)
                 .build());
 
         farming.addEntry(entryBuilder
-                .startIntSlider(
-                        Text.literal("Farming Delay (ms)"),
-                        AvariceConfig.INSTANCE.farmingDelayMs,
-                        50, 1000
+                .startEnumSelector(
+                        Text.literal("Crop Type"),
+                        CropType.class,
+                        CropType.fromInt(AvariceConfig.INSTANCE.cropType)
                 )
-                .setSaveConsumer(val -> AvariceConfig.INSTANCE.farmingDelayMs = val)
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.cropType = val.value)
                 .build());
 
-        /* FISHING TAB */
-        ConfigCategory fishing = builder.getOrCreateCategory(Text.literal("Fishing"));
-        fishing.addEntry(entryBuilder
+        farming.addEntry(entryBuilder
                 .startBooleanToggle(
-                        Text.literal("Enable Fishing"),
-                        AvariceConfig.INSTANCE.fishingEnabled
+                        Text.literal("Auto Kill Pests"),
+                        AvariceConfig.INSTANCE.autoKillPests
                 )
-                .setSaveConsumer(val -> AvariceConfig.INSTANCE.fishingEnabled = val)
+                .setTooltip(Text.literal("Automatically attacks pests while farming"))
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.autoKillPests = val)
                 .build());
 
-        fishing.addEntry(entryBuilder
-                .startIntSlider(
-                        Text.literal("Max Bobber Time (seconds)"),
-                        AvariceConfig.INSTANCE.maxBobberTimeSeconds,
-                        5, 60
+        /* ================= FAILSAFES ================= */
+
+        ConfigCategory failsafes = builder.getOrCreateCategory(
+                Text.literal("Failsafes")
+        );
+
+        failsafes.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Rotation Check Failsafe"),
+                        AvariceConfig.INSTANCE.rotationCheckFailsafe
                 )
-                .setSaveConsumer(val -> AvariceConfig.INSTANCE.maxBobberTimeSeconds = val)
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.rotationCheckFailsafe = val)
                 .build());
 
-        /* HUD TAB */
-        ConfigCategory hud = builder.getOrCreateCategory(Text.literal("HUD"));
+        failsafes.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Teleport Check Failsafe"),
+                        AvariceConfig.INSTANCE.teleportCheckFailsafe
+                )
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.teleportCheckFailsafe = val)
+                .build());
+
+        failsafes.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("GUI Open Failsafe"),
+                        AvariceConfig.INSTANCE.guiOpenFailsafe
+                )
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.guiOpenFailsafe = val)
+                .build());
+
+        failsafes.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Bedrock Check Failsafe"),
+                        AvariceConfig.INSTANCE.bedrockCheckFailsafe
+                )
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.bedrockCheckFailsafe = val)
+                .build());
+
+        failsafes.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Stuck Movement Failsafe"),
+                        AvariceConfig.INSTANCE.stuckMovementFailsafe
+                )
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.stuckMovementFailsafe = val)
+                .build());
+
+        failsafes.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Random Pause Failsafe"),
+                        AvariceConfig.INSTANCE.randomPauseFailsafe
+                )
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.randomPauseFailsafe = val)
+                .build());
+
+        /* ================= HUD ================= */
+
+        ConfigCategory hud = builder.getOrCreateCategory(
+                Text.literal("HUD")
+        );
+
         hud.addEntry(entryBuilder
                 .startBooleanToggle(
                         Text.literal("Enable HUD"),
                         AvariceConfig.INSTANCE.hudEnabled
                 )
+                .setTooltip(Text.literal("Shows farming/fishing status on screen"))
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.hudEnabled = val)
                 .build());
 
