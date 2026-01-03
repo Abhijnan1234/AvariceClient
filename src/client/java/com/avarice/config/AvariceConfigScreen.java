@@ -129,11 +129,36 @@ public class AvariceConfigScreen {
                 )
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.randomPauseFailsafe = val)
                 .build());
+        /* ================= BOOK UTILS ================= */
+
+        ConfigCategory bookUtils = builder.getOrCreateCategory(
+                Text.literal("Book Utils")
+        );
+
+        bookUtils.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Enable Book Combine Macro"),
+                        AvariceConfig.INSTANCE.bookMacroEnabled
+                )
+                .setTooltip(Text.literal("Master switch for book combining macro"))
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.bookMacroEnabled = val)
+                .build());
+
+        bookUtils.addEntry(entryBuilder
+                .startIntSlider(
+                        Text.literal("Max Book Level"),
+                        AvariceConfig.INSTANCE.maxBookLevel,
+                        1,
+                        12
+                )
+                .setTooltip(Text.literal("Maximum enchant/book level to combine up to"))
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.maxBookLevel = val)
+                .build());
 
         /* ================= HUD ================= */
 
         ConfigCategory hud = builder.getOrCreateCategory(
-                Text.literal("HUD")
+                Text.literal("Misc")
         );
 
         hud.addEntry(entryBuilder
@@ -143,6 +168,15 @@ public class AvariceConfigScreen {
                 )
                 .setTooltip(Text.literal("Shows farming/fishing status on screen"))
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.hudEnabled = val)
+                .build());
+
+        hud.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Enable AntiAfk"),
+                        AvariceConfig.INSTANCE.antiAfkEnabled
+                )
+                .setTooltip(Text.literal("Auto makes movement every 1 min"))
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.antiAfkEnabled= val)
                 .build());
 
         return builder.build();

@@ -1,9 +1,10 @@
 package com.avarice.config;
+
 public class AvariceConfig {
 
-        public static final AvariceConfig INSTANCE = new AvariceConfig();
+    public static final AvariceConfig INSTANCE = new AvariceConfig();
 
-        /* ===== FARMING ===== */
+    /* ===== FARMING ===== */
 
     public boolean farmingEnabled = false;
 
@@ -21,14 +22,25 @@ public class AvariceConfig {
     public int cropType = 0;
 
     public boolean autoKillPests = true;
-        /* ===== FAILSAFES ===== */
-        public boolean rotationCheckFailsafe = true;
-        public boolean teleportCheckFailsafe = true;
-        public boolean guiOpenFailsafe = true;
-        public boolean bedrockCheckFailsafe = true;
-        public boolean stuckMovementFailsafe = true;
-        public boolean randomPauseFailsafe = true;
-    /* HUD */
+
+    /* ===== FAILSAFES ===== */
+
+    public boolean rotationCheckFailsafe = true;
+    public boolean teleportCheckFailsafe = true;
+    public boolean guiOpenFailsafe = true;
+    public boolean bedrockCheckFailsafe = true;
+    public boolean stuckMovementFailsafe = true;
+    public boolean randomPauseFailsafe = true;
+
+    /* ===== HUD ===== */
+    public boolean antiAfkEnabled = false;
     public boolean hudEnabled = true;
+
+    /* ===== BOOK UTILS ===== */
+
+    public boolean bookMacroEnabled = false;
+
+    // Max enchant/book level to combine (example: 1–10)
+    public int maxBookLevel = 10;
 
 }
