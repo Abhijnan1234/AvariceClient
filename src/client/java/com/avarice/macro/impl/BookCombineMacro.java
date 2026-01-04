@@ -28,6 +28,19 @@ public class BookCombineMacro {
     private static final int SLOT_COMBINE = 22;
     private static boolean wasInAnvil = false;
 
+    public enum Signal {
+        NONE,
+        MAX_BOOK_REACHED
+    }
+
+    private static Signal signal = Signal.NONE;
+
+    public static Signal pollSignal() {
+        Signal s = signal;
+        signal = Signal.NONE;
+        return s;
+    }
+
     private enum State {
         IDLE,
         FIND,
@@ -37,6 +50,13 @@ public class BookCombineMacro {
         WAIT_SECOND,
         CLICK_COLLECT,
         CLICK_COMBINE
+    }
+    public static void forceReset() {
+        state = State.IDLE;
+        min = 0;
+        baseBook = null;
+        sacrificeBook = null;
+        signal = Signal.NONE;
     }
 
     private static boolean isHypixelAnvil() {
@@ -104,16 +124,21 @@ public class BookCombineMacro {
             p.sendMessage(Text.literal("§cNo combinable books left"), false);
             min=0;
             state = State.IDLE;
+            signal = Signal.MAX_BOOK_REACHED; // 🔔 signal only
+            mc.player.closeHandledScreen();
             return;
         }
 
         int lvl = BookUtil.getLevelFromLore(baseBook);
-
         if (lvl >= AvariceConfig.INSTANCE.maxBookLevel) {
-            p.sendMessage(Text.literal("§aMax book level reached"), false);
+            mc.player.sendMessage(Text.literal("§aMax book level reached"), false);
+            min = 0;
             state = State.IDLE;
+            signal = Signal.MAX_BOOK_REACHED; // 🔔 signal only
+            mc.player.closeHandledScreen();
             return;
         }
+
 
         sacrificeBook = BookUtil.findSameLevelBook(p, baseBook);
         if (sacrificeBook == null) {
@@ -139,11 +164,8 @@ public class BookCombineMacro {
             state = State.IDLE;
             return;
         }
-        mc.player.sendMessage(Text.literal("Inv "+invSlot), false);
-
         // Inventory slots are always the last 36
         int containerSlot = handler.slots.size() - 36 + invSlot-9;
-
         mc.interactionManager.clickSlot(
                 handler.syncId,
                 containerSlot,
@@ -177,8 +199,6 @@ public class BookCombineMacro {
         ScreenHandler handler = mc.player.currentScreenHandler;
         return handler.slots.get(slot).hasStack();
     }
-    /* ================= DELAY ================= */
-
     private static void delay() {
         delayTicks = 12 + random.nextInt(8);
     }

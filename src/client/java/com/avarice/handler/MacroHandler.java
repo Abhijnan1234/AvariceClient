@@ -9,6 +9,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AnvilScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.text.Text;
+import com.avarice.macro.impl.BazaarMacro;
+import com.avarice.keybind.AvariceKeybinds;
+import com.avarice.macro.impl.BazaarMacro;
 
 public class MacroHandler {
 
@@ -50,6 +53,18 @@ public class MacroHandler {
         if (AvariceConfig.INSTANCE.antiAfkEnabled) {
             AntiAFKMacro.onTick();
         }
+        /* ================= BAZAAR ================= */
+        // Bazaar macro toggle
+        // Manual toggle ONLY
+        if (AvariceKeybinds.bazaarMacroKey.wasPressed()) {
+            BazaarMacro.toggle();
+        }
+
+// AutoBZCollect just allows BazaarMacro to run, NOT toggle
+        if (AvariceConfig.INSTANCE.autoBZCollect) {
+            BazaarMacro.onTick();
+        }
+
         // Book macro tick (event-driven)
         handleBookMacro();
     }
@@ -71,6 +86,7 @@ public class MacroHandler {
 
         BookCombineMacro.onTick();
     }
+
 
     public static boolean isMacroRunning() {
         return activeMacro != null && activeMacro.isRunning();

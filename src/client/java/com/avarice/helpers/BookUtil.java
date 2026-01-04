@@ -14,56 +14,32 @@ import java.util.List;
 
 public class BookUtil {
 
-    private static final String TARGET_ENCHANT = "Infinite Quiver";
-
+    private static final int INV_START = 9;
+    private static final int INV_END = 35;
     /* ================= FIND LOWEST ================= */
 
-    public static ItemStack findLowestLevelBook(PlayerEntity player) {
-        ItemStack lowest = ItemStack.EMPTY;
-        int lowestLevel = Integer.MAX_VALUE;
-
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-
-            ParsedBook book = parseBook(stack);
-            if (book == null) continue;
-
-            if (book.level < lowestLevel) {
-                player.sendMessage(
-                        Text.literal("LOWEST BOOK:"+book.level),false);
-                lowestLevel = book.level;
-                lowest = stack;
-            }
-        }
-
-        return lowest.isEmpty() ? null : lowest;
-    }
 
     /* ================= FIND SAME LEVEL ================= */
-
     public static ItemStack findSameLevelBook(PlayerEntity player, ItemStack base) {
         ParsedBook baseBook = parseBook(base);
         if (baseBook == null) return null;
 
-        for (int i = 0; i < player.getInventory().size(); i++) {
+        for (int i = INV_START; i <= INV_END; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (stack == base) continue;
 
             ParsedBook book = parseBook(stack);
             if (book == null) continue;
 
-            if (book.level == baseBook.level) {
-                player.sendMessage(
-                        Text.literal("SAME BOOK:"+book.level),false);
+            if (book.level() == baseBook.level()
+                    && book.ultimate() == baseBook.ultimate()) {
                 return stack;
             }
         }
-
         return null;
     }
 
     /* ================= CORE PARSER ================= */
-
     private static ParsedBook parseBook(ItemStack stack) {
         if (stack.isEmpty()) return null;
         if (stack.getItem() != Items.ENCHANTED_BOOK) return null;
@@ -79,13 +55,19 @@ public class BookUtil {
                         : TooltipType.BASIC
         );
 
+        boolean isUltimate = false;
+
         for (Text line : tooltip) {
             String raw = line.getString().trim();
 
-            // Skip vanilla title
+            if (raw.contains("Ultimate Enchantment")) {
+                isUltimate = true;
+                continue;
+            }
+
             if (raw.equals("Enchanted Book")) continue;
 
-            // Expect: "Infinite Quiver VI"
+            // "<Enchant Name> <Roman>"
             String[] parts = raw.split(" ");
             if (parts.length < 2) continue;
 
@@ -97,28 +79,28 @@ public class BookUtil {
                     Arrays.copyOf(parts, parts.length - 1)
             );
 
-            if (!name.equalsIgnoreCase(TARGET_ENCHANT)) continue;
-            mc.player.sendMessage(
-                    Text.literal("FOUND BOOK: " + name + " " + level),
-                    false
-            );
-            return new ParsedBook(name, level);
+            return new ParsedBook(name, level, isUltimate);
         }
 
         return null;
     }
 
     /* ================= SLOT FIND ================= */
+    public static int findInventorySlot(PlayerEntity player, ItemStack targetStack) {
+        ParsedBook target = parseBook(targetStack);
+        if (target == null) return -1;
 
-    public static int findInventorySlot(PlayerEntity player, ItemStack target) {
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            if (player.getInventory().getStack(i) == target) {
+        for (int i = INV_START; i <= INV_END; i++) {
+            ParsedBook book = parseBook(player.getInventory().getStack(i));
+            if (book == null) continue;
+
+            if (book.level() == target.level()
+                    && book.ultimate() == target.ultimate()) {
                 return i;
             }
         }
         return -1;
     }
-
     /* ================= HELPER RECORD ================= */
     public static int getLevelFromLore(ItemStack stack) {
         ParsedBook book = parseBook(stack);
@@ -128,7 +110,7 @@ public class BookUtil {
         ItemStack lowest = null;
         int lowestLevel = Integer.MAX_VALUE;
 
-        for (int i = 0; i < player.getInventory().size(); i++) {
+        for (int i = INV_START; i <= INV_END; i++) {
             ItemStack stack = player.getInventory().getStack(i);
             int lvl = getLevelFromLore(stack);
 
@@ -142,7 +124,7 @@ public class BookUtil {
         return lowest;
     }
 
+    private record ParsedBook(String name, int level, boolean ultimate) {}
 
-    private record ParsedBook(String name, int level) {}
 
 }

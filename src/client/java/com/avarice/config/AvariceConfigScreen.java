@@ -140,7 +140,7 @@ public class AvariceConfigScreen {
                         Text.literal("Enable Book Combine Macro"),
                         AvariceConfig.INSTANCE.bookMacroEnabled
                 )
-                .setTooltip(Text.literal("Master switch for book combining macro"))
+                .setTooltip(Text.literal("Auto combines your books when enabled"))
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.bookMacroEnabled = val)
                 .build());
 
@@ -154,6 +154,16 @@ public class AvariceConfigScreen {
                 .setTooltip(Text.literal("Maximum enchant/book level to combine up to"))
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.maxBookLevel = val)
                 .build());
+
+        bookUtils.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Enable Auto Collect from Bazaar"),
+                        AvariceConfig.INSTANCE.autoBZCollect
+                )
+                .setTooltip(Text.literal("Collects your books from sell orders in Bazaar automatically"))
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.autoBZCollect = val)
+                .build());
+
 
         /* ================= HUD ================= */
 

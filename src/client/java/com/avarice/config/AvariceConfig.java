@@ -37,9 +37,8 @@ public class AvariceConfig {
     public boolean hudEnabled = true;
 
     /* ===== BOOK UTILS ===== */
-
     public boolean bookMacroEnabled = false;
-
+    public boolean autoBZCollect= false;
     // Max enchant/book level to combine (example: 1–10)
     public int maxBookLevel = 10;
 
