@@ -1,7 +1,11 @@
 package com.avarice.macro.impl;
 
+import com.avarice.config.AvariceConfig;
+import com.avarice.helpers.BookUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
@@ -111,23 +115,14 @@ public class BazaarMacro {
                     delay();
                     return;
                 }
-
-                ScreenHandler handler = mc.player.currentScreenHandler;
-
-                // Slot 9 = first inventory slot (NOT hotbar)
-                if (handler.slots.size() > 9 && handler.slots.get(9).hasStack()) {
-
-                    mc.interactionManager.clickSlot(
-                            handler.syncId,
-                            9,
-                            1,
-                            SlotActionType.THROW,
-                            mc.player
-                    );
+                // 🔁 Keep dropping until no max-level books remain
+                if (dropAllMaxLevelBooks()) {
+                    return; // still dropping, stay in this state
                 }
-
+                delay();
                 state = State.OPEN_BZ;
                 delay();
+
             }
             case OPEN_BZ -> {
                 // Send command only once
@@ -156,7 +151,7 @@ public class BazaarMacro {
                 state = State.CLICK_19;
             }
             case CLICK_19 -> {
-                clickSafe(19);
+                clickSafe(18+AvariceConfig.INSTANCE.BOSLOT);
 
                 state = State.CLOSE_INV;
             }
@@ -199,6 +194,55 @@ public class BazaarMacro {
         );
 
         delay();
+    }
+    private static boolean dropAllMaxLevelBooks() {
+        if (mc.player == null) return false;
+
+        PlayerEntity player = mc.player;
+
+        // Step 1: find a target slot
+        int targetSlot = -1;
+
+        for (int i = 9; i <= 35; i++) { // inventory only
+            ItemStack stack = player.getInventory().getStack(i);
+            int lvl = BookUtil.getLevelFromLore(stack);
+
+            if (lvl >= AvariceConfig.INSTANCE.maxBookLevel) {
+                targetSlot = i;
+                break; // drop ONE per tick (safe)
+            }
+        }
+
+        // Nothing to drop
+        if (targetSlot == -1) return false;
+
+        // Step 2: ensure inventory is open
+        if (!(mc.currentScreen instanceof HandledScreen<?>)) {
+            mc.setScreen(new InventoryScreen(player));
+            delay();
+            return true; // wait, retry next tick
+        }
+
+        // Step 3: throw the book
+        ScreenHandler handler = player.currentScreenHandler;
+
+        int containerSlot = handler.slots.size() - 36 + (targetSlot - 9)-1;
+
+        mc.interactionManager.clickSlot(
+                handler.syncId,
+                containerSlot,
+                1,
+                SlotActionType.THROW,
+                player
+        );
+
+        player.sendMessage(
+                Text.literal("§eDropped max-level book"),
+                false
+        );
+
+        delay();
+        return true; // more may exist → call again next tick
     }
 
     private static void reset(String reason) {

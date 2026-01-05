@@ -164,7 +164,16 @@ public class AvariceConfigScreen {
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.autoBZCollect = val)
                 .build());
 
-
+        bookUtils.addEntry(entryBuilder
+                .startIntSlider(
+                        Text.literal("Buy Order Slot"),
+                        AvariceConfig.INSTANCE.BOSLOT,
+                        1,
+                        21
+                )
+                .setTooltip(Text.literal("Sell order no. to collect your books from"))
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.BOSLOT = val)
+                .build());
         /* ================= HUD ================= */
 
         ConfigCategory hud = builder.getOrCreateCategory(
@@ -185,8 +194,17 @@ public class AvariceConfigScreen {
                         Text.literal("Enable AntiAfk"),
                         AvariceConfig.INSTANCE.antiAfkEnabled
                 )
-                .setTooltip(Text.literal("Auto makes movement every 1 min"))
+                .setTooltip(Text.literal("Auto checks for AFK and kick"))
                 .setSaveConsumer(val -> AvariceConfig.INSTANCE.antiAfkEnabled= val)
+                .build());
+
+        hud.addEntry(entryBuilder
+                .startBooleanToggle(
+                        Text.literal("Enable AutoMovement"),
+                        AvariceConfig.INSTANCE.autoMov
+                )
+                .setTooltip(Text.literal("Auto moves every minutes to prevent AFK kick"))
+                .setSaveConsumer(val -> AvariceConfig.INSTANCE.autoMov= val)
                 .build());
 
         return builder.build();

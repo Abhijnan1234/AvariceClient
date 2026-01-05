@@ -1,5 +1,6 @@
 package com.avarice.macro.impl;
 
+import com.avarice.config.AvariceConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import java.util.regex.Pattern;
@@ -65,7 +66,7 @@ public class AntiAFKMacro {
         }
 
         timer++;
-        if (timer >= INTERVAL_TICKS) {
+        if (timer >= INTERVAL_TICKS && AvariceConfig.INSTANCE.autoMov) {
             timer = 0;
             performAction();
         }

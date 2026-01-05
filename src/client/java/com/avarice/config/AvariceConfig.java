@@ -32,14 +32,16 @@ public class AvariceConfig {
     public boolean stuckMovementFailsafe = true;
     public boolean randomPauseFailsafe = true;
 
-    /* ===== HUD ===== */
+    /* ===== MISC ===== */
     public boolean antiAfkEnabled = false;
+    public boolean autoMov = false;
     public boolean hudEnabled = true;
 
     /* ===== BOOK UTILS ===== */
     public boolean bookMacroEnabled = false;
     public boolean autoBZCollect= false;
     // Max enchant/book level to combine (example: 1–10)
+    public int BOSLOT=1;
     public int maxBookLevel = 10;
 
 }
